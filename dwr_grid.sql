@@ -55,7 +55,7 @@ with p as (
   from p
  ),
  c as (
-  select 'Feature Col lection' as type,
+  select 'Feature Collection' as type,
   array_to_json(array_agg(feature),true) as features
   from f
 )
