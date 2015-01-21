@@ -1,4 +1,4 @@
-# DWR Modeling Grind (dwr-grid)
+# DWR Modeling Grid (dwr-grid)
 
 California's Department of Water Resoources (DWR) uses a number of grids, covering California for various modeling efforts.  Two of these are regular grids using the California Albers [EPSG:3310](http://spatialreference.org/ref/epsg/3310/) projection, and aligned so that the origin of that projection falls on the corners of the grid.  
 
