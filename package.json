@@ -1,0 +1,19 @@
+{
+  "name": "dwr-grid",
+  "version": "1.0.0",
+  "description": "California DWR Planning Grids",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+    "repository": "git:/CSTARS/dwr-grid.git",
+  "keywords": [
+    "California",
+    "Grid"
+  ],
+  "author": "Quinn Hart <qjhart@ucdavis.edu> (https://www.researchgate.net/profile/Quinn_Hart)",
+  "license": "CCM",
+  "bugs": {
+    "url": "https://github.com/CSTARS/dwr-grid/issues"
+  },
+  "files":["geojson","shp"]
+}
