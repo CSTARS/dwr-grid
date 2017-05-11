@@ -74,8 +74,8 @@ east,north,
 st_setsrid(st_makepoint(east,north),3310)::geometry('Point',3310) as centroid,
 st_setsrid(
   st_makebox2d(
-   st_makepoint(east-2000,north-2000),
-   st_makepoint(east+2000,north+2000)),3310)::geometry('Polygon',3310) as boundary
+   st_makepoint(east-1000,north-1000),
+   st_makepoint(east+1000,north+1000)),3310)::geometry('Polygon',3310) as boundary
 from en;
 
 create table state (
