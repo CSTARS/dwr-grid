@@ -1,0 +1,55 @@
+* Pixel creation
+#+PROPERTY: header-args:sql :engine postgresql :cmdline "service=boundary" :tangle yes
+
+** PostgresSQL Extensions
+
+Postgis is used if we want to use GIS functions, eg. to join on bounding boxes;
+
+#+BEGIN_SRC sql
+  create table cimis_pixels (
+  east integer,
+  north integer,
+  state integer
+  );
+  \copy cimis_pixels from cimis_500m_state.txt with csv delimiter ' ';
+#+END_SRC
+
+#+RESULTS:
+
+#+begin_src sql
+-- CIMIS pixels retrieved from website.
+create table pixel_boundary as
+select
+east,north,
+st_setsrid(st_makebox2d(
+ st_makepoint(east-500,north-500),
+ st_makepoint(east+500,north+500)),3310) as boundary
+from cimis_pixels;
+
+#+end_src
+
+
+create view cimis_geojson as 
+with p as (
+ select
+  'Feature' as type,
+  row_to_json((select l from (select east,north) as l),true) as properties,
+  st_asgeojson(st_transform(boundary,4269))::json as geometry
+ from pixels_boundary
+ ),
+ f as (
+  select row_to_json(p,true) as feature
+  from p
+ ),
+ c as (
+  select 'Feature Collection' as type,
+  array_to_json(array_agg(feature),true) as features
+  from f
+)
+select row_to_json(c,true) as geojson
+from c;
+
+
+#+begin_src bash
+  ls
+#+end_src

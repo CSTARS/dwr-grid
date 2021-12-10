@@ -1,0 +1,64 @@
+* Initialize Database
+#+PROPERTY: header-args:sql :engine postgresql :cmdline "service=eto-zones" :tangle yes
+
+** PostgresSQL Extensions
+
+Postgis is used if we want to use GIS functions, eg. to join on bounding boxes;
+
+#+BEGIN_SRC sql
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+COMMENT ON EXTENSION postgis IS 'Postgis Geographic Package';
+#+END_SRC
+
+#+RESULTS:
+| CREATE EXTENSION |
+|------------------|
+| COMMENT          |
+| ALTER DATABASE   |
+
+
+#+BEGIN_SRC sql
+CREATE EXTENSION IF NOT EXISTS plv8;
+COMMENT ON EXTENSION plv8 IS 'Postgres Javascript (v8)';
+#+END_SRC
+
+** Default Search Path
+
+Add goes to front of search path. This will add all the goes functions to the
+~goes~ schema.
+
+#+BEGIN_SRC sql
+alter database :DBNAME set search_path to goes,public;
+#+END_SRC
+
+#+RESULTS:
+| ALTER DATABASE |
+|----------------|
+
+** Authentication Roles
+
+It's possible, we'll want to use PGR to initialize our tool. We'll setup some
+authentication for that eventuality.
+
+#+BEGIN_SRC sql
+CREATE ROLE anon;
+CREATE ROLE admin;
+CREATE ROLE authenticator noinherit;
+
+-- ALLOW PGR TO UPGRADE ROLES
+GRANT anon TO authenticator;
+GRANT admin TO authenticator;
+#+END_SRC
+
+Also we need to allow anon login for our db connections. The login is
+needed for the postgres/qgis connections.
+
+#+BEGIN_SRC sql
+alter user anon encrypted password 'anon';
+alter role anon login ;
+#+END_SRC
+
+#+RESULTS:
+| ALTER ROLE |
+|------------|
+| ALTER ROLE |

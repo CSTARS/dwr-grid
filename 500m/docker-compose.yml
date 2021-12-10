@@ -1,0 +1,20 @@
+# Create with alias bdc='CURRENT_UID=$(id -u):$(id -g) docker-compose -p scb -f ~/spatial-cimis-boundary/scb.yml'
+version: '3'
+
+services:
+  db:
+#    image: eto-zones-maps:latest
+    build: ./docker/db
+    restart: always
+    environment:
+      - POSTGRES_DB=pixels
+      - POSTGRES_USER=scb
+      - POSTGRES_PASSWORD=scb
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  db:
+    driver: local
