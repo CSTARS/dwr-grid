@@ -3,8 +3,8 @@ version: '3'
 
 services:
   db:
-#    image: eto-zones-maps:latest
-    build: ./docker/db
+    image: local-dev/dwr-grid-500m-db:latest
+#    build: ./docker/db
     restart: always
     environment:
       - POSTGRES_DB=pixels
@@ -12,6 +12,7 @@ services:
       - POSTGRES_PASSWORD=scb
     volumes:
       - db:/var/lib/postgresql/data
+      - ./io:/io
     ports:
       - 5432:5432
 

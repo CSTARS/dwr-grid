@@ -1,5 +1,5 @@
 * Pixel creation
-#+PROPERTY: header-args:sql :engine postgresql :cmdline "service=boundary" :tangle yes
+#+PROPERTY: header-args:sql :engine postgresql :cmdline "service=pixels" :tangle yes
 
 ** PostgresSQL Extensions
 
@@ -11,31 +11,43 @@ Postgis is used if we want to use GIS functions, eg. to join on bounding boxes;
   north integer,
   state integer
   );
-  \copy cimis_pixels from cimis_500m_state.txt with csv delimiter ' ';
+  copy cimis_pixels from '/docker-entrypoint-initdb.d/cimis_500m_state.txt' with csv delimiter ' ';
 #+END_SRC
 
 #+RESULTS:
+|---|
+
 
 #+begin_src sql
--- CIMIS pixels retrieved from website.
-create table pixel_boundary as
-select
-east,north,
-st_setsrid(st_makebox2d(
- st_makepoint(east-500,north-500),
- st_makepoint(east+500,north+500)),3310) as boundary
-from cimis_pixels;
-
+  -- CIMIS pixels retrieved from website.
+  create table pixel_boundary as
+  select
+  east,north,
+  st_setsrid(st_makepoint(east,north),3310) as centroid,
+  st_setsrid(st_makebox2d(
+   st_makepoint(east-250,north-250),
+   st_makepoint(east+250,north+250)),3310) as boundary
+  from cimis_pixels;
+  create index p500_centroid_idx on pixel_boundary using GIST(centroid);
+  create index p500_boundary_idx on pixel_boundary using GIST(boundary);
 #+end_src
 
+#+RESULTS:
+| SELECT 1642286 |
+|----------------|
+| CREATE INDEX   |
+| CREATE INDEX   |
 
-create view cimis_geojson as 
+
+
+#+begin_src sql
+create view cimis_geojson as
 with p as (
  select
   'Feature' as type,
   row_to_json((select l from (select east,north) as l),true) as properties,
   st_asgeojson(st_transform(boundary,4269))::json as geometry
- from pixels_boundary
+ from pixel_boundary
  ),
  f as (
   select row_to_json(p,true) as feature
@@ -48,8 +60,64 @@ with p as (
 )
 select row_to_json(c,true) as geojson
 from c;
-
-
-#+begin_src bash
-  ls
 #+end_src
+
+#+RESULTS:
+| CREATE VIEW |
+|-------------|
+
+** Missing 4km Pixels
+
+   This isn't completely joined with the dwr_grid.sql setup yet.
+
+
+#+BEGIN_SRC sql
+  create table missing_4km (
+         dwr_id varchar(7)
+  );
+  copy missing_4km from '/docker-entrypoint-initdb.d/missing_4km.csv' with csv;
+#+END_SRC
+
+#+RESULTS:
+| CREATE TABLE |
+|--------------|
+| COPY 681     |
+
+#+begin_src sql :tangle no
+  create view missing500m as
+  select p.east,p.north,p.boundary,c.dwr_id
+  from missing_4km
+  join dwr_grid.calsimetaw c using(dwr_id)
+  join pixel_boundary p
+  on st_within(p.centroid,c.boundary)
+#+end_src
+
+#+RESULTS:
+| CREATE VIEW |
+|-------------|
+
+#+begin_src sql
+create view missing500m_geojson as
+with p as (
+ select
+  'Feature' as type,
+  row_to_json((select l from (select dwr_id,east,north) as l),true) as properties,
+  st_asgeojson(st_transform(boundary,4269))::json as geometry
+ from missing500m
+ ),
+ f as (
+  select row_to_json(p,true) as feature
+  from p
+ ),
+ c as (
+  select 'Feature Collection' as type,
+  array_to_json(array_agg(feature),true) as features
+  from f
+)
+select row_to_json(c,true) as geojson
+from c;
+#+end_src
+
+#+RESULTS:
+| CREATE VIEW |
+|-------------|

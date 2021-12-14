@@ -6,7 +6,7 @@ drop schema dwr_grid cascade;
 create schema dwr_grid;
 set search_path=dwr_grid,public;
 
-create table dwr_grid as 
+create table dwr_grid as
 with en as (
 select
 (row||'_'||col)::varchar(7) as dwr_id,
@@ -42,7 +42,9 @@ boundary
 from dwr_grid i
 join calsimetaw_inp using (dwr_id);
 
-create view calsimetaw_geojson as 
+create index calsimetaw_boundary_idx on calsimetaw using GIST(boundary);
+
+create view calsimetaw_geojson as
 with p as (
  select
   'Feature' as type,
@@ -89,7 +91,7 @@ select east,north,boundary
 from cimis_grid
 join state using (east,north);
 
-create view cimis_geojson as 
+create view cimis_geojson as
 with p as (
  select
   'Feature' as type,

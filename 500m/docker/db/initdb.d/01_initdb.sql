@@ -1,10 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 COMMENT ON EXTENSION postgis IS 'Postgis Geographic Package';
 
-CREATE EXTENSION IF NOT EXISTS plv8;
-COMMENT ON EXTENSION plv8 IS 'Postgres Javascript (v8)';
-
-alter database :DBNAME set search_path to goes,public;
+alter database :DBNAME set search_path to public;
 
 CREATE ROLE anon;
 CREATE ROLE admin;

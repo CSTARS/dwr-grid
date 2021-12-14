@@ -4,7 +4,7 @@ MAINTAINER Quinn Hart <qjhart@ucdavis.edu>
 RUN apt-get update \
 	&& apt-get install -y build-essential git-core \
 	postgresql-server-dev-$PG_MAJOR \
-	postgresql-$PG_MAJOR-postgis-3 postgresql-$PG_MAJOR-postgis-3-scripts \
+	postgresql-$PG_MAJOR-postgis-3 postgresql-$PG_MAJOR-postgis-3-scripts postgis \
   curl wget less \
   && rm -rf /var/lib/apt/lists/*
 
