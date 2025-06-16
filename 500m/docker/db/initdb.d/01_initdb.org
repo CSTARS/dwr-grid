@@ -11,10 +11,11 @@ COMMENT ON EXTENSION postgis IS 'Postgis Geographic Package';
 #+END_SRC
 
 #+RESULTS:
-|---|
+| CREATE EXTENSION |
+|------------------|
+| COMMENT          |
+| ALTER DATABASE   |
 
-
-Our current setup isn't including plv8 just yet.
 
 #+BEGIN_SRC sql :tangle no
 CREATE EXTENSION IF NOT EXISTS plv8;
@@ -23,11 +24,11 @@ COMMENT ON EXTENSION plv8 IS 'Postgres Javascript (v8)';
 
 ** Default Search Path
 
-   If you want to add some additional schema's to the search path, you can
-   include them here.  This is a nice defaults to have.
+Add goes to front of search path. This will add all the goes functions to the
+~goes~ schema.
 
 #+BEGIN_SRC sql
-alter database :DBNAME set search_path to public;
+alter database :DBNAME set search_path to goes,public;
 #+END_SRC
 
 #+RESULTS:

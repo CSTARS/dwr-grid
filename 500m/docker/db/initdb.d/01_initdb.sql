@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 COMMENT ON EXTENSION postgis IS 'Postgis Geographic Package';
 
-alter database :DBNAME set search_path to public;
+alter database :DBNAME set search_path to goes,public;
 
 CREATE ROLE anon;
 CREATE ROLE admin;
